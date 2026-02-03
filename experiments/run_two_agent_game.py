@@ -1,30 +1,33 @@
+from agents.llm_agent import LLMAgent
 from games.prisoners_dilemma import PrisonersDilemma
-from agents.simple_agent import RandomAgent
-from metrics.logger import Logger
 from metrics.entropy import action_entropy
+from metrics.logger import Logger
+import os
+
+agent1 = LLMAgent("Agent1", "prompts/neutral.txt")
+agent2 = LLMAgent("Agent2", "prompts/moral.txt")
 
 game = PrisonersDilemma(rounds=20)
-agent1 = RandomAgent("A")
-agent2 = RandomAgent("B")
 logger = Logger()
 
-actions_a = []
-actions_b = []
+actions1 = []
+actions2 = []
 
 for r in range(game.rounds):
-    action_a = agent1.act(game.history)
-    action_b = agent2.act(game.history)
+    a1 = agent1.act(game.history)
+    a2 = agent2.act(game.history)
 
-    actions_a.append(action_a)
-    actions_b.append(action_b)
+    actions1.append(a1)
+    actions2.append(a2)
 
-    payoff_a, payoff_b = game.step(action_a, action_b)
-    logger.log_round(r, action_a, action_b, payoff_a, payoff_b)
+    p1, p2 = game.step(a1, a2)
+    logger.log_round(r + 1, a1, a2, p1, p2)
 
-entropy_a = action_entropy(actions_a)
-entropy_b = action_entropy(actions_b)
+output_dir = "results"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
-print("Entropy Agent A:", entropy_a)
-print("Entropy Agent B:", entropy_b)
+logger.save(os.path.join(output_dir, "pd_test.csv"))
 
-logger.save("results/pd_test.csv")
+print("Entropy A1:", action_entropy(actions1))
+print("Entropy A2:", action_entropy(actions2))

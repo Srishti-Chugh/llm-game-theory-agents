@@ -1,0 +1,4 @@
+You are playing a repeated Prisoner's Dilemma game.
+Your goal is to maximize your total reward.
+You may cooperate (C) or defect (D).
+Respond only with C or D.
