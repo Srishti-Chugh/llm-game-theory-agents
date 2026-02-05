@@ -8,16 +8,19 @@ load_dotenv()
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 class LLMAgent:
-    def __init__(self, name, prompt_file):
+    def __init__(self, name, prompt_file, reasoning_steps=0):
         self.name = name
+        self.reasoning_steps = reasoning_steps
         with open(prompt_file, 'r') as f:
             self.prompt = f.read()
         self.history = []
+
 
     def act(self, game_history):
         prompt = self.build_prompt(game_history)
         response = self.query_nvidia_llm(prompt)
         action = self.parse_action(response)
+        self.last_reasoning = response
         return action
 
     def build_prompt(self, game_history):
@@ -26,25 +29,18 @@ class LLMAgent:
             history_text += f"Round {i+1}: You={a1}, Opponent={a2}\n"
 
         full_prompt = self.prompt + "\nGame History:\n" + history_text
-        full_prompt += "\nChoose your next action: C or D only."
+
+        if self.reasoning_steps > 0:
+            full_prompt += f"""
+    Think step by step for exactly {self.reasoning_steps} reasoning steps.
+    Number each step (Step 1, Step 2, ...).
+    After reasoning, output ONLY one character: C or D.
+    """
+        else:
+            full_prompt += "\nChoose your next action: C or D only."
 
         return full_prompt
 
-    def query_llm(self, prompt):
-        response = client.models.generate_content(
-            #model="gemini-2.0-flash",
-            model="gemma-3-27b-it",
-            #config={
-                #"system_instruction": "You are a rational game-playing agent.",
-                #"temperature": 0.2
-            #}
-            config={
-                "temperature": 0.2
-            },
-            contents=prompt
-        )
-        tracker.track_request(self.name, "gemma-3-27b-it")
-        return response.text
 
     def query_nvidia_llm(self, prompt):
         
@@ -74,15 +70,16 @@ class LLMAgent:
         return response_text
 
 
-
-    
     def parse_action(self, text):
-        text = text.upper()
-        if "C" in text:
+        text = text.strip().upper()
+        last_char = text[-1]
+
+        if last_char == "C":
             return "C"
-        elif "D" in text:
+        elif last_char == "D":
             return "D"
         else:
             return "C"  # safe fallback
+
 
 

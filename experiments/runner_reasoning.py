@@ -1,28 +1,36 @@
 import os
 import pandas as pd
-from agents.llm_agent import LLMAgent
+from agents.llm_agent_reasoning import LLMAgent
 from games.prisoners_dilemma import PrisonersDilemma
-from metrics.logger import Logger
+from metrics.logger_reasoning import Logger
 from metrics.entropy import entropy_over_time, action_entropy
 from metrics.cooperation import cooperation_rate
 from metrics.nash import nash_deviation
 from metrics.payoff import average_payoff
 from plots.plot_results import plot_entropy, plot_cooperation
 
-agent1 = LLMAgent("Agent1", "prompts/neutral.txt")
-agent2 = LLMAgent("Agent2", "prompts/moral.txt")
+reasoning_levels = [0, 1, 3, 5]
 
-game = PrisonersDilemma(rounds=20)
-logger = Logger()
+for REASONING_STEPS in reasoning_levels:
 
-actions1 = []
-actions2 = []
-payoffs_a = []
-payoffs_b = []
+    agent1 = LLMAgent("Agent1", "prompts/neutral.txt", reasoning_steps=REASONING_STEPS)
+    agent2 = LLMAgent("Agent2", "prompts/moral.txt", reasoning_steps=REASONING_STEPS)
+
+    game = PrisonersDilemma(rounds=20)
+    logger = Logger()
+
+    actions1 = []
+    actions2 = []
+    payoffs_a = []
+    payoffs_b = []
+
 
 for r in range(game.rounds):
     a1 = agent1.act(game.history)
     a2 = agent2.act(game.history)
+
+    reasoning1 = agent1.last_reasoning
+    reasoning2 = agent2.last_reasoning
 
     p1, p2 = game.step(a1, a2)
 
@@ -31,12 +39,14 @@ for r in range(game.rounds):
     payoffs_a.append(p1)
     payoffs_b.append(p2)
 
-    logger.log_round(r + 1, a1, a2, p1, p2)
+    logger.log_round(r+1, a1, a2, p1, p2, reasoning1, reasoning2)
+
 
 output_dir = "results"
 os.makedirs(output_dir, exist_ok=True)
 
-logger.save(os.path.join(output_dir, "pd_test.csv"))
+csv_file = os.path.join(output_dir, f"pd_reasoning_{REASONING_STEPS}.csv")
+logger.save(csv_file)
 
 entropy_a = entropy_over_time(actions1)
 entropy_b = entropy_over_time(actions2)
@@ -61,14 +71,17 @@ avg_payoff_a = average_payoff(payoffs_a)
 avg_payoff_b = average_payoff(payoffs_b)
 
 summary_data = {
+    "reasoning_steps": REASONING_STEPS,
     "coop_a": coop_a,
     "coop_b": coop_b,
     "entropy_a_final": entropy_a[-1],
     "entropy_b_final": entropy_b[-1],
-    "nash_deviation": nash_dev
+    "nash_deviation": nash_dev,
+    "avg_payoff_a": avg_payoff_a,
+    "avg_payoff_b": avg_payoff_b
 }
 
-summary_file = "results/summary.csv"
+summary_file = "results/summary_reasoning.csv"
 
 # If file exists, append; else create
 if os.path.exists(summary_file):
