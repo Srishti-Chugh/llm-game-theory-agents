@@ -14,3 +14,10 @@ def entropy_over_time(actions, window=5):
         window_actions = actions[start:i+1]
         entropies.append(action_entropy(window_actions))
     return entropies
+
+def convergence_time(actions):
+    for i in range(2, len(actions)):
+        if len(set(actions[i:])) == 1:
+            return i
+    return -1  # never converged
+

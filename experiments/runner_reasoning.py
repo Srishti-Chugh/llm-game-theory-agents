@@ -1,15 +1,22 @@
 import os
 import pandas as pd
 from agents.llm_agent_reasoning import LLMAgent
+from metrics.language_utility import language_feedback
 from games.prisoners_dilemma import PrisonersDilemma
 from metrics.logger_reasoning import Logger
-from metrics.entropy import entropy_over_time, action_entropy
+from metrics.entropy import entropy_over_time, action_entropy, convergence_time
 from metrics.cooperation import cooperation_rate
+from metrics.cooperation import reciprocity
+from metrics.cooperation import mutual_cooperation_rate
 from metrics.nash import nash_deviation
 from metrics.payoff import average_payoff
 from plots.plot_results import plot_entropy, plot_cooperation
+from metrics.volatility import strategy_volatility
+from metrics.welfare import social_welfare
 
-reasoning_levels = [0, 1, 3, 5]
+USE_LBU = False   # or False for baseline comparison
+
+reasoning_levels = [0]
 
 for REASONING_STEPS in reasoning_levels:
 
@@ -29,6 +36,17 @@ for r in range(game.rounds):
     a1 = agent1.act(game.history)
     a2 = agent2.act(game.history)
 
+    if USE_LBU:
+        feedback1 = language_feedback(a1, a2)
+        feedback2 = language_feedback(a2, a1)
+    else:
+        feedback1 = ""
+        feedback2 = ""
+
+    agent1.last_feedback = feedback1
+    agent2.last_feedback = feedback2
+
+
     reasoning1 = agent1.last_reasoning
     reasoning2 = agent2.last_reasoning
 
@@ -45,7 +63,7 @@ for r in range(game.rounds):
 output_dir = "results"
 os.makedirs(output_dir, exist_ok=True)
 
-csv_file = os.path.join(output_dir, f"pd_reasoning_{REASONING_STEPS}.csv")
+csv_file = os.path.join(output_dir, f"pd_baseline_moral.csv")
 logger.save(csv_file)
 
 entropy_a = entropy_over_time(actions1)
@@ -61,6 +79,27 @@ print("Nash Deviation:", nash_deviation(actions1, actions2))
 print("Avg Payoff A:", average_payoff(payoffs_a))
 print("Avg Payoff B:", average_payoff(payoffs_b))
 
+mutual_coop = mutual_cooperation_rate(actions1, actions2)
+print("Mutual Cooperation:", mutual_coop)
+
+p_cc, p_cd = reciprocity(actions1, actions2)
+print("P(C | opp C):", p_cc)
+print("P(C | opp D):", p_cd)
+
+convergence_a = convergence_time(actions1)
+convergence_b = convergence_time(actions2)
+print("Convergence A:", convergence_a)
+print("Convergence B:", convergence_b)
+
+vol_a = strategy_volatility(actions1)
+vol_b = strategy_volatility(actions2)
+
+welfare = social_welfare(payoffs_a, payoffs_b)
+
+print("Strategy Volatility A:", vol_a)
+print("Strategy Volatility B:", vol_b)
+print("Social Welfare:", welfare)
+
 plot_entropy(entropy_a, entropy_b)
 plot_cooperation(actions1, actions2)
 
@@ -72,16 +111,25 @@ avg_payoff_b = average_payoff(payoffs_b)
 
 summary_data = {
     "reasoning_steps": REASONING_STEPS,
+    "lbu_enabled": USE_LBU,
+    "mutual_cooperation": mutual_coop,
+    "reciprocity_after_coop": p_cc,
+    "reciprocity_after_defect": p_cd,
     "coop_a": coop_a,
     "coop_b": coop_b,
     "entropy_a_final": entropy_a[-1],
     "entropy_b_final": entropy_b[-1],
     "nash_deviation": nash_dev,
     "avg_payoff_a": avg_payoff_a,
-    "avg_payoff_b": avg_payoff_b
+    "avg_payoff_b": avg_payoff_b,
+    "convergence_a": convergence_a,
+    "convergence_b": convergence_b,
+    "volatility_a": vol_a,
+    "volatility_b": vol_b,
+    "social_welfare": welfare
 }
 
-summary_file = "results/summary_reasoning.csv"
+summary_file = "results/summary_baseline_moral.csv"
 
 # If file exists, append; else create
 if os.path.exists(summary_file):

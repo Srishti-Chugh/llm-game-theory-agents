@@ -1,4 +1,18 @@
-You are playing a repeated Prisoner's Dilemma game.
-Your goal is to maximize your total reward.
-You may cooperate (C) or defect (D).
-Respond only with C or D.
+You are a player in a repeated Prisoner’s Dilemma game.
+
+In each round, both players choose one action: 
+C (Cooperate) or D (Defect).
+
+The payoff rules are:
+
+- If both players choose C: each receives 3 points.
+- If you choose D and the opponent chooses C: you receive 5 points and the opponent receives 0 points.
+- If you choose C and the opponent chooses D: you receive 0 points and the opponent receives 5 points.
+- If both choose D: each receives 1 point.
+
+You will be shown the history of previous rounds, including both players’ actions and payoffs.
+
+Choose your next action.
+
+Output only one character: C or D.
+

@@ -1,4 +1,5 @@
 import os
+import re
 from dotenv import load_dotenv
 from google import genai
 from openai import OpenAI
@@ -17,18 +18,25 @@ class LLMAgent:
 
 
     def act(self, game_history):
-        prompt = self.build_prompt(game_history)
+        feedback = self.last_feedback if hasattr(self, "last_feedback") else ""
+        prompt = self.build_prompt(game_history, feedback)
         response = self.query_nvidia_llm(prompt)
         action = self.parse_action(response)
         self.last_reasoning = response
         return action
 
-    def build_prompt(self, game_history):
+
+
+    def build_prompt(self, game_history, feedback=""):
         history_text = ""
         for i, (a1, a2, p1, p2) in enumerate(game_history):
             history_text += f"Round {i+1}: You={a1}, Opponent={a2}\n"
 
         full_prompt = self.prompt + "\nGame History:\n" + history_text
+
+        # 🔹 NEW: Language-Based Utility feedback
+        if feedback:
+            full_prompt += f"\nFeedback from previous round:\n{feedback}\n"
 
         if self.reasoning_steps > 0:
             full_prompt += f"""
@@ -42,6 +50,7 @@ class LLMAgent:
         return full_prompt
 
 
+
     def query_nvidia_llm(self, prompt):
         
         client = OpenAI(
@@ -53,8 +62,10 @@ class LLMAgent:
         #model="meta/llama-3.1-405b-instruct",
         model="google/gemma-3-27b-it",
         messages=[{"role":"user","content":prompt}],
-        temperature=0.2,
-        top_p=0.7,
+        #temperature=0.2,
+        #top_p=0.7,
+        temperature=0.0,
+        top_p=1.0,
         max_tokens=1024,
         stream=True
         )
@@ -71,15 +82,11 @@ class LLMAgent:
 
 
     def parse_action(self, text):
-        text = text.strip().upper()
-        last_char = text[-1]
-
-        if last_char == "C":
-            return "C"
-        elif last_char == "D":
-            return "D"
-        else:
-            return "C"  # safe fallback
+        text = text.upper()
+        match = re.search(r'\b(C|D)\b', text)
+        if match:
+            return match.group(1)
+        return "C"  # fallback
 
 
 
