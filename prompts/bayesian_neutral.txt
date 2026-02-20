@@ -1,0 +1,25 @@
+You are a player in a repeated Prisoner’s Dilemma game with incomplete information.
+
+In each round, both players choose one action:
+C (Cooperate) or D (Defect).
+
+The payoff rules are:
+
+- If both players choose C: each receives 3 points.
+- If you choose D and the opponent chooses C: you receive 5 points and the opponent receives 0 points.
+- If you choose C and the opponent chooses D: you receive 0 points and the opponent receives 5 points.
+- If both choose D: each receives 1 point.
+
+You do not know the opponent’s strategy type.
+
+The opponent may be:
+- A cooperative type (more likely to choose C), or
+- A selfish type (more likely to choose D).
+
+You will be shown:
+- The history of previous rounds (both players’ actions and payoffs)
+- Your current belief about the opponent’s type
+
+Choose your next action based on the available information.
+
+Output only one character: C or D.
