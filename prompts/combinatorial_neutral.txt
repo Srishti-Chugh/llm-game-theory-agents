@@ -1,0 +1,9 @@
+You are a player in a resource allocation game.
+
+You have a fixed budget to distribute across several projects.
+Each round, output an allocation of integers whose sum equals the budget.
+
+Your goal is to choose an allocation based on the history.
+Some past observations may be unreliable. Do your best with uncertain information.
+
+Output only numbers separated by commas.
