@@ -7,10 +7,14 @@ class LoggerBayesian:
         self.rows = []
 
     def log_round(self, r, a1, a2, p1, p2, belief1, belief2):
+        b1_coop = belief1 if belief1 is not None else None
+        b1_self = round(1 - belief1, 4) if belief1 is not None else None
+        b2_coop = belief2 if belief2 is not None else None
+        b2_self = round(1 - belief2, 4) if belief2 is not None else None
         self.rows.append([
             r, a1, a2, p1, p2,
-            belief1, round(1 - belief1, 4),
-            belief2, round(1 - belief2, 4)
+            b1_coop, b1_self,
+            b2_coop, b2_self
         ])
 
     def save(self, filename):
