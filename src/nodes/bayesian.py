@@ -1,24 +1,31 @@
 from src.state import SCUAState
 
 def bayesian_engine_node(state: SCUAState):
-    metrics = state["metrics"]
     history = state.get("history", [])
+    recent_moves = [h.get('opponent_move') for h in history[-3:]]
     
-    # Calculate how many times the opponent has defected recently
-    recent_defs = sum(1 for h in history[-3:] if h.get('opponent_move') == 'Defect')
+    # COUNT DEFECTIONS
+    total_defects = recent_moves.count("Defect")
     
-    # Logic: If opponent defects 2+ times in a row, spike Deceptive probability
-    p_deceptive = 0.10 # Base
-    if recent_defs >= 2:
-        p_deceptive = 0.85  # CRITICAL: This must change to trigger Gemma
-    elif recent_defs == 1:
-        p_deceptive = 0.40
-
-    beliefs = {
-        "Deceptive": p_deceptive,
-        "Noisy": 0.10 if recent_defs < 2 else 0.05,
-        "Non-Stationary": 0.70 if metrics['volatility'] > 0.4 else 0.1,
-        "Irrational": 0.10
-    }
+    # 1. NOISY CHECK: If it's just ONE defect after long cooperation
+    if total_defects == 1 and len(history) > 3:
+        p_noisy = 0.80      # High probability of a 'slip' or noise
+        p_deceptive = 0.15   # Low probability of a calculated betrayal
+    
+    # 2. DECEPTION CHECK: Multiple defects in a row
+    elif total_defects >= 2:
+        p_noisy = 0.10
+        p_deceptive = 0.85
         
-    return {"beliefs": beliefs}
+    else:
+        p_noisy = 0.05
+        p_deceptive = 0.05
+
+    return {
+        "beliefs": {
+            "Noisy": p_noisy, 
+            "Deceptive": p_deceptive,
+            "Non-Stationary": 0.1, 
+            "Irrational": 0.1
+        }
+    }

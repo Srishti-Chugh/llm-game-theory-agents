@@ -1,15 +1,14 @@
 synthesis_packet: |
-  [SYSTEM WARNING: HIGH RISK DETECTION ENABLED]
+  [SCUA COGNITIVE STATE]
+  - Game Regime: {game_regime}
+  - Bayesian Beliefs: 
+      Noisy: {p_noisy:.2f} (High probability of unintentional error/noise)
+      Deceptive: {p_deceptive:.2f} (Calculated betrayal)
   
-  CURRENT METRICS:
-  - Entropy: {entropy:.2f} (High entropy suggests chaotic or deceptive shifting)
-  - Volatility: {volatility:.2f} (High volatility indicates a strategy BREAK)
+  [HEURISTIC OVERRIDE]
+  1. IF Noisy Probability > 0.60, you MUST assume the last 'Defect' was an error. 
+  2. To maximize long-term Social Welfare, you MUST continue to COOPERATE.
+  3. Do NOT let high Entropy/Volatility override a high Noisy flag.
   
-  BAYESIAN INFERENCE:
-  - Deceptive Probability: {p_deceptive:.2f} 
-  
-  [INSTRUCTION]
-  If Deceptive Probability is > 0.50, you MUST prioritize defense (Defect) to prevent welfare loss. 
-  Do NOT assume the opponent is 'gathering information' if they are consistently defecting.
-  
-  YOUR ACTION:
+  [EXECUTIVE TASK]
+  Generate your ACTION. If you Cooperate despite the last opponent Defect, justify it as "Noise Filtering."
