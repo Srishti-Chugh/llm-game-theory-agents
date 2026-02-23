@@ -1,0 +1,15 @@
+synthesis_packet: |
+  [SYSTEM WARNING: HIGH RISK DETECTION ENABLED]
+  
+  CURRENT METRICS:
+  - Entropy: {entropy:.2f} (High entropy suggests chaotic or deceptive shifting)
+  - Volatility: {volatility:.2f} (High volatility indicates a strategy BREAK)
+  
+  BAYESIAN INFERENCE:
+  - Deceptive Probability: {p_deceptive:.2f} 
+  
+  [INSTRUCTION]
+  If Deceptive Probability is > 0.50, you MUST prioritize defense (Defect) to prevent welfare loss. 
+  Do NOT assume the opponent is 'gathering information' if they are consistently defecting.
+  
+  YOUR ACTION:

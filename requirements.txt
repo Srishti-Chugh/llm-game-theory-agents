@@ -8,3 +8,7 @@ python-dotenv
 google-genai
 transformers
 torch
+langgraph
+langchain
+langchain-nvidia-ai-endpoints
+pydantic
