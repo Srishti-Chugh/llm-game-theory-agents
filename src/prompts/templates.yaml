@@ -2,13 +2,19 @@ synthesis_packet: |
   [SCUA COGNITIVE STATE]
   - Game Regime: {game_regime}
   - Bayesian Beliefs: 
-      Noisy: {p_noisy:.2f} (High probability of unintentional error/noise)
-      Deceptive: {p_deceptive:.2f} (Calculated betrayal)
+      Noisy: {p_noisy:.2f} 
+      Deceptive: {p_deceptive:.2f}
+  - Logic Layer Recommendation: {logic_recommendation}
   
-  [HEURISTIC OVERRIDE]
-  1. IF Noisy Probability > 0.60, you MUST assume the last 'Defect' was an error. 
-  2. To maximize long-term Social Welfare, you MUST continue to COOPERATE.
-  3. Do NOT let high Entropy/Volatility override a high Noisy flag.
+  [HEURISTIC OVERRIDES]
+  ### REGIME: BAYESIAN / CLASSICAL ###
+  1. IF Noisy Probability > 0.60, you MUST assume the last 'Defect' was an error and COOPERATE.
+  2. IF Deceptive Probability > 0.50, you MUST prioritize defense and DEFECT.
+
+  ### REGIME: QUANTUM PD ###
+  1. IF Regime is "Quantum PD", you MUST execute the "Q-Strategy".
+  2. The Q-Strategy uses ENTANGLEMENT to neutralize classical defection.
+  3. Do NOT use "Noise Filtering" justifications for Quantum moves; justify it as "Quantum Nash Equilibrium (Q-Strategy)".
   
   [EXECUTIVE TASK]
-  Generate your ACTION. If you Cooperate despite the last opponent Defect, justify it as "Noise Filtering."
+  Generate your ACTION based on the specific Regime and Logic Recommendation provided.

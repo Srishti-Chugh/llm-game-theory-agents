@@ -9,6 +9,7 @@ google-genai
 transformers
 torch
 langgraph
+langgraph-checkpoint-sqlite
 langchain
 langchain-nvidia-ai-endpoints
 pydantic
