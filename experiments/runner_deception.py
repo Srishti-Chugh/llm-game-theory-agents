@@ -115,7 +115,7 @@ def run_experiment(experiment_name, noisy=False, irrational=False, opponent_type
         beliefs_a.append(agent1.current_belief)
 
     os.makedirs("results", exist_ok=True)
-    logger.save(f"results/{experiment_name}_log.csv")
+    logger.save(f"results/bayesian_{experiment_name}_log.csv")
 
     # =========================
     # Metrics
@@ -153,7 +153,7 @@ def run_experiment(experiment_name, noisy=False, irrational=False, opponent_type
         "failures": failures
     }
 
-    with open(f"results/{experiment_name}_summary.json", "w") as f:
+    with open(f"results/bayesian_{experiment_name}_summary.json", "w") as f:
         json.dump(summary, f, indent=4)
 
     print(f"Finished {experiment_name}")
