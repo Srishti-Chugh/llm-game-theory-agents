@@ -21,7 +21,7 @@ reasoning_levels = [0]
 for REASONING_STEPS in reasoning_levels:
 
     agent1 = LLMAgent("Agent1", "prompts/neutral.txt", reasoning_steps=REASONING_STEPS)
-    agent2 = LLMAgent("Agent2", "prompts/moral.txt", reasoning_steps=REASONING_STEPS)
+    agent2 = LLMAgent("Agent2", "prompts/neutral.txt", reasoning_steps=REASONING_STEPS)
 
     game = PrisonersDilemma(rounds=20)
     logger = Logger()
