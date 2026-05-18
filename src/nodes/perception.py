@@ -13,9 +13,12 @@ def perception_node(state: SCUAState):
     move_values = [1.0 if m == "Cooperate" else 0.0 for m in opponent_moves]
     vol = calculate_volatility(move_values)
     
-    # Logic for the "Contextual Classifier"
-    # For now, we use a simple heuristic; this could be an LLM call later
-    regime = "Bayesian PD" if len(history) < 10 else "Combinatorial"
+    # Contextual classifier: long histories → Combinatorial. Or set game_regime on initial_state to force a regime.
+    preset = (state.get("game_regime") or "").strip()
+    if preset in ("Bayesian PD", "Combinatorial", "Quantum PD"):
+        regime = preset
+    else:
+        regime = "Bayesian PD" if len(history) < 10 else "Combinatorial"
     
     return {
         "metrics": {
