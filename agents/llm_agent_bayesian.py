@@ -4,6 +4,12 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
+_repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(_repo_root, ".env"))
+load_dotenv(os.path.join(os.path.dirname(_repo_root), ".env"))
+
+# Gemma 3 27B was retired on NVIDIA API; default to Llama — override with SCUA_NVIDIA_MODEL in .env if needed.
+_DEFAULT_NVIDIA_CHAT_MODEL = "meta/llama-3.1-8b-instruct"
 
 class BayesianLLMAgent:
     def __init__(self, name, prompt_file, reasoning_steps=0, prior_belief=0.5):
@@ -80,8 +86,9 @@ After reasoning, output ONLY one character: C or D.
             api_key=os.getenv("NVIDIA_API_KEY")
         )
 
+        model = os.environ.get("SCUA_NVIDIA_MODEL", _DEFAULT_NVIDIA_CHAT_MODEL)
         completion = client.chat.completions.create(
-            model="google/gemma-3-27b-it",
+            model=model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.0,
             top_p=1.0,

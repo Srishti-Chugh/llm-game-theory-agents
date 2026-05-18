@@ -5,6 +5,7 @@ seaborn
 scipy
 tqdm
 python-dotenv
+openai
 google-genai
 transformers
 torch
